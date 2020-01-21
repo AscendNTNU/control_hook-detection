@@ -9,15 +9,20 @@
 
 
 #include <ros.h>
-#include <std_msgs/Bool.h>
+//#include <std_msgs/Bool.h>
+
+#include <std_msgs/UInt8.h>
 
 ros::NodeHandle nh;
 
-std_msgs::Bool left_msg;
-std_msgs::Bool right_msg;
+ //std_msgs::Bool left_msg;
+//std_msgs::Bool right_msg;
 
-ros::Publisher pub_claw_left("clawLEFT", &left_msg);
-ros::Publisher pub_claw_right("clawRIGHT", &right_msg);
+std_msgs::UInt8 claw_msg;
+
+
+ros::Publisher pub_claw("claw_contact", &claw_msg);
+
 
 
 const int sensor_pin_1 = A0; //input_1 signal
@@ -34,50 +39,48 @@ const int ledPin = 13;
 void setup() {
   // put your setup code here, to run once:
   nh.initNode();
-  nh.advertise(pub_claw_left);
-  nh.advertise(pub_claw_right);
+  nh.advertise(pub_claw);
   
   pinMode(ledPin,OUTPUT);
   //Serial.begin(9600);
-
-  
   
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
 
   sensor_value_1 = analogRead(sensor_pin_1);
   sensor_value_2 = analogRead(sensor_pin_2);
 
+  //debug info
   Serial.println(sensor_value_1);
-  //Serial.println("/n");
   Serial.println(sensor_value_2);
+  //****
 
-  //Left sensor
-  if (sensor_value_1 > 950) {
+
+  if (sensor_value_1 > 950 && sensor_value_2 > 950) {
     digitalWrite(ledPin,HIGH);
-    left_msg.data = 1;
-    pub_claw_left.publish(&left_msg);
-  }
-  else {
-    digitalWrite(ledPin,LOW);
-    left_msg.data = 0;
-    pub_claw_left.publish(&left_msg);
+    claw_msg.data = 3;
+    pub_claw.publish(&claw_msg);
   }
 
-  //Right sensor
-  if (sensor_value_2 > 950) {
+  else if (sensor_value_1 > 950) {
     digitalWrite(ledPin,HIGH);
-    right_msg.data = 1;
-    pub_claw_right.publish(&right_msg);
-  }
-  else {
-    digitalWrite(ledPin,LOW);
-    right_msg.data = 0;
-    pub_claw_right.publish(&right_msg);
+    claw_msg.data = 1;
+    pub_claw.publish(&claw_msg);
   }
   
+  else if (sensor_value_2 > 950) {
+    digitalWrite(ledPin,HIGH);
+    claw_msg.data = 2;
+    pub_claw.publish(&claw_msg);
+  }
+  
+  else {
+    digitalWrite(ledPin,LOW);
+    claw_msg.data = 0;
+    pub_claw.publish(&claw_msg);
+  }
+
   
   nh.spinOnce();
 }
