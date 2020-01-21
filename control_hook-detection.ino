@@ -1,22 +1,13 @@
-//Detect if closed loop
+//Arduino ROS code for detecting contact with antenna module
 
 //For å starte node i ROS:
 //rosrun rosserial_python serial_node.py /dev/ttyACM0
 
 
-
-
-
-
 #include <ros.h>
-//#include <std_msgs/Bool.h>
-
 #include <std_msgs/UInt8.h>
 
 ros::NodeHandle nh;
-
- //std_msgs::Bool left_msg;
-//std_msgs::Bool right_msg;
 
 std_msgs::UInt8 claw_msg;
 
